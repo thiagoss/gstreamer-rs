@@ -7,6 +7,7 @@ members = [
   "gstreamer-base",
   "gstreamer-player",
   "gstreamer-video",
+  "gstreamer-pbutils",
   "examples",
   "tutorials",
 ]

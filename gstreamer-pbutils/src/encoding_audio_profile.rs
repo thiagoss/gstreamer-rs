@@ -5,6 +5,8 @@ use std::error;
 use std::fmt;
 
 use auto::EncodingAudioProfile;
+use encoding_profile::EncodingProfileBuilder;
+use encoding_profile::EncodingProfileBuilderData;
 
 
 #[derive(Debug, Clone)]
@@ -27,23 +29,24 @@ impl error::Error for EncodingAudioProfileBuilderError {
 }
 
 pub struct EncodingAudioProfileBuilder<'a> {
-    format: Option<& 'a gst::Caps>,
-    preset: Option<& 'a str>,
-    restriction: Option<& 'a gst::Caps>,
-    presence: u32
+    base : EncodingProfileBuilderData
 }
 
-impl<'a> EncodingAudioProfileBuilder<'a> {
+impl EncodingAudioProfileBuilder<'a> {
     pub fn new() -> Self {
         EncodingAudioProfileBuilder {
-            format: None,
-            preset: None,
-            restriction: None,
-            presence: 0,
+            base: EncodingProfileBuilderData::new(),
         }
     }
+}
 
-    pub fn build(self) -> Result<EncodingAudioProfile, EncodingAudioProfileBuilderError> {
+impl<'a> EncodingProfileBuilder for EncodingAudioProfileBuilder<'a> {
+
+    fn get_encoding_profile_builder(&self) -> &'a mut EncodingProfileBuilderData<'a> {
+        &self.base
+    }
+
+    fn build(self) -> Result<EncodingAudioProfile, EncodingAudioProfileBuilderError> {
         if self.format.is_none() {
             return Err(EncodingAudioProfileBuilderError);
         }
@@ -52,33 +55,5 @@ impl<'a> EncodingAudioProfileBuilder<'a> {
             self.format.unwrap(), self.preset, self.restriction, self.presence);
 
         Ok(profile)
-    }
-
-    pub fn format(self, format: & 'a gst::Caps) -> Self {
-        Self {
-            format: Some(format),
-            ..self
-        }
-    }
-
-    pub fn restriction(self, restriction: & 'a gst::Caps) -> Self {
-        Self {
-            restriction: Some(restriction),
-            ..self
-        }
-    }
-
-    pub fn preset(self, preset: & 'a str) -> Self {
-        Self {
-            preset: Some(preset),
-            ..self
-        }
-    }
-
-    pub fn presence(self, presence: u32) -> Self {
-        Self {
-            presence: presence,
-            ..self
-        }
     }
 }

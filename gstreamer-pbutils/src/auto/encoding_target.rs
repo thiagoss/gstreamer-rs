@@ -5,7 +5,6 @@
 use EncodingProfile;
 use Error;
 use ffi;
-use glib;
 use glib::object::IsA;
 use glib::translate::*;
 use glib_ffi;
@@ -23,13 +22,6 @@ glib_wrapper! {
 }
 
 impl EncodingTarget {
-    pub fn new(name: &str, category: &str, description: &str, profiles: &[EncodingProfile]) -> EncodingTarget {
-        assert_initialized_main_thread!();
-        unsafe {
-            from_glib_full(ffi::gst_encoding_target_new(name.to_glib_none().0, category.to_glib_none().0, description.to_glib_none().0, profiles.to_glib_none().0))
-        }
-    }
-
     pub fn load<'a, P: Into<Option<&'a str>>>(name: &str, category: P) -> Result<EncodingTarget, Error> {
         assert_initialized_main_thread!();
         let category = category.into();
@@ -55,8 +47,6 @@ unsafe impl Send for EncodingTarget {}
 unsafe impl Sync for EncodingTarget {}
 
 pub trait EncodingTargetExt {
-    fn add_profile<P: IsA<EncodingProfile>>(&self, profile: &P) -> Result<(), glib::error::BoolError>;
-
     fn get_category(&self) -> String;
 
     fn get_description(&self) -> String;
@@ -73,12 +63,6 @@ pub trait EncodingTargetExt {
 }
 
 impl<O: IsA<EncodingTarget>> EncodingTargetExt for O {
-    fn add_profile<P: IsA<EncodingProfile>>(&self, profile: &P) -> Result<(), glib::error::BoolError> {
-        unsafe {
-            glib::error::BoolError::from_glib(ffi::gst_encoding_target_add_profile(self.to_glib_none().0, profile.to_glib_full()), "Failed to add profile")
-        }
-    }
-
     fn get_category(&self) -> String {
         unsafe {
             from_glib_none(ffi::gst_encoding_target_get_category(self.to_glib_none().0))

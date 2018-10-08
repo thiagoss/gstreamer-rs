@@ -58,6 +58,9 @@ pub use discoverer_video_info::*;
 mod encoding_profile;
 pub use encoding_profile::*;
 
+mod encoding_target;
+pub use encoding_target::*;
+
 // Re-export all the traits in a prelude module, so that applications
 // can always "use gst::prelude::*" without getting conflicts
 pub mod prelude {
@@ -69,6 +72,7 @@ pub mod prelude {
     pub use discoverer_video_info::*;
 
     pub use encoding_profile::*;
+    pub use encoding_target::*;
 
     pub use auto::traits::*;
 }
